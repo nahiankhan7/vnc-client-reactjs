@@ -16,5 +16,5 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "novnc-core.d.ts"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/novnc-core.d.ts"]
 }
