@@ -1,26 +1,19 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import VncViewer from "./components/VncViewer";
 
-function App() {
+const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ width: "100vw", height: "100vh" }}>
+      <h1>VNC Client ReactJS</h1>
+      <VncViewer
+        url="ws://vnc-5900.steamer.qaclan.com"
+        viewOnly={false}
+        width="100%"
+        height="100%"
+        onError={(error) => console.error("Error connecting to VNC", error)}
+      />
     </div>
   );
-}
+};
 
 export default App;
