@@ -9,67 +9,101 @@ const App = () => {
   const [url, setUrl] = useState("");
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [inputError, setInputError] = useState<string>(""); // Track input error message
+  const [inputError, setInputError] = useState(""); // Track input error message
   const vncContainerRef = useRef<HTMLDivElement | null>(null);
   const rfbRef = useRef<RFB | null>(null);
 
+  // Validate WebSocket URL
   const validateUrl = (url: string) => {
     const regex = /^(wss?:\/\/)[\w.-]+(:\d+)?$/;
     return regex.test(url);
   };
 
+  // Connect to VNC Server
   const connectVNC = () => {
     if (url.trim() === "") {
       setInputError("Please enter a WebSocket URL.");
       return;
-    } else if (!validateUrl(url)) {
-      setInputError("Invalid URL format. Use ws://example.com:5900.");
-      return;
-    } else {
-      setInputError(""); // Clear error message if input is valid
     }
 
-    if (!vncContainerRef.current) return;
+    if (!validateUrl(url)) {
+      setInputError("Invalid URL format. Use ws://example.com:5900.");
+      return;
+    }
 
-    // Set connecting state to true
-    setIsConnecting(true);
+    setInputError(""); // Clear error message if input is valid
+
+    if (!vncContainerRef.current) {
+      toast.error("VNC container is not available.");
+      return;
+    }
+
+    setIsConnecting(true); // Set connecting state
 
     try {
-      rfbRef.current = new RFB(vncContainerRef.current, url, {
-        credentials: { password: "your-vnc-password" },
+      // Initialize the RFB instance
+      const rfb = new RFB(vncContainerRef.current, url, {
+        credentials: {
+          password: "your-vnc-password", // Replace with actual password or dynamically manage credentials
+        },
       });
-      rfbRef.current.viewOnly = false;
-      rfbRef.current.scaleViewport = true;
-      rfbRef.current.resizeSession = true;
 
-      rfbRef.current.addEventListener("disconnect", () => {
-        toast.warning("VNC Disconnected.");
+      // Configure RFB instance properties
+      rfb.viewOnly = false;
+      rfb.scaleViewport = true;
+      rfb.resizeSession = true;
+      rfbRef.current = rfb;
+
+      // Handle RFB events
+      rfb.addEventListener("connect", () => {
+        toast.success("Connected to the VNC server.");
+        setIsConnected(true);
+        setIsConnecting(false);
+      });
+
+      rfb.addEventListener("disconnect", (event) => {
+        const isClean = event.detail?.clean ?? false;
+        toast.warning(
+          `Disconnected from VNC server. ${
+            isClean ? "Clean disconnection." : "Unexpected disconnection."
+          }`
+        );
         setIsConnected(false);
-        setIsConnecting(false); // Reset connecting state when disconnected
+        setIsConnecting(false);
       });
 
-      setIsConnected(true);
-      setIsConnecting(false); // Reset connecting state once connected
-      toast.success("Connected successfully.");
+      rfb.addEventListener("securityfailure", (event) => {
+        const reason = event.detail?.reason || "Unknown error";
+        toast.error(`Security failure: ${reason}`);
+        setIsConnecting(false);
+      });
+
+      rfb.addEventListener("credentialsrequired", () => {
+        toast.warning(
+          "Credentials required. Please provide valid credentials."
+        );
+      });
     } catch (error) {
-      toast.error("Failed to connect to VNC server.");
-      console.error(error);
-      setIsConnecting(false); // Reset connecting state on error
+      toast.error("Failed to connect to the VNC server.");
+      console.error("Connection error:", error);
+      setIsConnecting(false);
     }
   };
 
+  // Disconnect from VNC Server
   const disconnectVNC = () => {
     if (rfbRef.current) {
       rfbRef.current.disconnect();
       rfbRef.current = null;
       setIsConnected(false);
-      toast.warning("Disconnected from VNC server.");
+      toast.info("Disconnected from the VNC server.");
     }
   };
 
+  // Clear URL input
   const clearInput = () => {
-    setUrl(""); // Clear the URL input field
-    setInputError(""); // Clear any error message
+    setUrl("");
+    setInputError("");
   };
 
   return (
@@ -98,7 +132,6 @@ const App = () => {
               placeholder="ws://example.com:5900"
               className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            {/* Clear Input Button */}
             <button
               onClick={clearInput}
               className="px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
@@ -116,7 +149,7 @@ const App = () => {
         <div className="flex items-center justify-between space-x-4 mt-4">
           <button
             onClick={connectVNC}
-            disabled={isConnected || isConnecting} // Disable button if connecting or already connected
+            disabled={isConnected || isConnecting}
             className={`w-1/2 px-4 py-2 rounded font-medium transition ${
               isConnecting || isConnected
                 ? "bg-gray-600 cursor-not-allowed"
