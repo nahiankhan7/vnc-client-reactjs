@@ -2,8 +2,8 @@ import React, { useState, useRef } from "react";
 import RFB from "novnc-core";
 import { motion } from "framer-motion";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Add Toastify styles
-import { FaSpinner } from "react-icons/fa"; // Import a spinner icon for loading state
+import "react-toastify/dist/ReactToastify.css";
+import { FaSpinner } from "react-icons/fa";
 
 const App = () => {
   const [url, setUrl] = useState("");
@@ -14,7 +14,7 @@ const App = () => {
   const rfbRef = useRef<RFB | null>(null);
 
   const validateUrl = (url: string) => {
-    const regex = /^(wss?:\/\/)[\w.-]+(:\d+)?$/; // Validates WebSocket URL
+    const regex = /^(wss?:\/\/)[\w.-]+(:\d+)?$/;
     return regex.test(url);
   };
 
