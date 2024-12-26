@@ -155,7 +155,16 @@ const App = () => {
                 ? "bg-gray-600 cursor-not-allowed"
                 : "bg-blue-500 hover:bg-blue-600"
             }`}>
-            {isConnecting ? <FaSpinner className="animate-spin" /> : "Connect"}
+            {isConnecting ? (
+              <span className="flex items-center justify-center gap-2">
+                <FaSpinner className="animate-spin" />
+                Connecting...
+              </span>
+            ) : isConnected ? (
+              "Connected"
+            ) : (
+              "Connect"
+            )}
           </button>
           <button
             onClick={disconnectVNC}
