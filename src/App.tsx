@@ -107,13 +107,14 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white">
+    <div className="min-h-screen p-4 flex flex-col lg:flex-row gap-4 items-center justify-center bg-gray-900 text-white">
       {/* Card Container */}
       <motion.div
+        id="card-container"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-lg sm:max-w-xl lg:max-w-2xl p-6 bg-gray-800 rounded-lg shadow-lg">
+        className="w-full max-w-lg p-6 bg-gray-800 rounded-lg shadow-lg">
         <h1 className="text-2xl font-bold mb-6 text-center">VNC Viewer</h1>
 
         {/* URL Input */}
@@ -182,7 +183,7 @@ const App = () => {
       {/* VNC Viewer Container */}
       <div
         ref={vncContainerRef}
-        className="w-full max-w-4xl h-72 sm:h-80 md:h-96 mt-6 bg-black rounded-lg border border-gray-700"></div>
+        className="w-full max-w-6xl h-72 sm:h-80 md:h-[600px] mt-6 bg-black rounded-lg border border-gray-700"></div>
 
       {/* Toastify Container */}
       <ToastContainer />
