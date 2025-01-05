@@ -13,6 +13,23 @@ const App = () => {
   const vncContainerRef = useRef<HTMLDivElement | null>(null);
   const rfbRef = useRef<RFB | null>(null);
 
+  // Mouse speed
+  const vncCanvas = vncContainerRef.current;
+  const canvas = vncCanvas?.querySelector("canvas");
+  if (canvas) {
+    console.log(canvas);
+  } else {
+    console.log("Canvas not found");
+  }
+  canvas?.addEventListener("mousemove", (e) => {
+    const scaleFactor = 0.1;
+    const slowX = e.clientX * scaleFactor;
+    const slowY = e.clientY * scaleFactor;
+
+    // Use the modified coordinates for your logic
+    console.log("Slowed mouse move:", slowX, slowY);
+  });
+
   // Validate WebSocket URL
   const validateUrl = (url: string) => {
     const regex = /^(wss?:\/\/)[\w.-]+(:\d+)?$/;
